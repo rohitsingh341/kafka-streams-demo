@@ -1,0 +1,41 @@
+version: "3.9"
+
+services:
+
+  zookeeper:
+    image: bitnami/zookeeper:3.8.1
+    networks:
+      - streams-network
+    ports:
+      - "2181:2181"
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+
+  kafka:
+    image: bitnami/kafka:3.4.0
+    networks:
+      - streams-network
+    ports:
+      - "9092:9092"
+      - "9093:9093"
+    depends_on:
+      - zookeeper
+    environment:
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CLIENT:SASL_PLAINTEXT,EXTERNAL:PLAINTEXT,INTERNAL:PLAINTEXT
+      - KAFKA_BROKER_ID=1
+      - KAFKA_CFG_LISTENERS=CLIENT://:9092,EXTERNAL://:9093,INTERNAL://:9094
+      - KAFKA_CFG_ADVERTISED_LISTENERS=CLIENT://kafka:9092,EXTERNAL://localhost:9093,INTERNAL://kafka:9094
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=INTERNAL
+      - KAFKA_CLIENT_USERS=kafka
+      - KAFKA_CLIENT_PASSWORDS=compose-kafka
+      - KAFKA_CFG_SASL_ENABLED_MECHANISMS=PLAIN,SCRAM-SHA-512
+      - KAFKA_CFG_SASL_MECHANISM_INTER_BROKER_PROTOCOL=PLAIN
+      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
+      - BITNAMI_DEBUG=true
+      - KAFKA_ENABLE_KRAFT=false
+
+networks:
+  streams-network:
+    driver: bridge

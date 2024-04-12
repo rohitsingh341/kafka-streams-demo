@@ -26,7 +26,7 @@ public class KafkaStreamsDemoApplication {
         properties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
         properties.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass());
         properties.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.String().getClass());
-
+        properties.put(StreamsConfig.STATE_DIR_CONFIG, "unique-directory");
         StreamsBuilder streamsBuilder = new StreamsBuilder();
 
         KStream<String, String> kStream = streamsBuilder.stream("word-count-input");
